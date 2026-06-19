@@ -1,0 +1,10 @@
+type: custom:radar-zone-card
+title: Radar Map
+device_id: your_home_assistant_device_id
+configurator_url: http://your-device-ip/
+range_x: 3000
+range_y: 6000
+hold_ms: 1500
+show_distance: true
+distance_decimals: 2
+selected_zone: zone_1

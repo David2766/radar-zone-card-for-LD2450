@@ -1,0 +1,23 @@
+type: custom:radar-zone-card
+title: Radar Map
+range_x: 3000
+range_y: 6000
+hold_ms: 1500
+show_distance: true
+distance_decimals: 2
+selected_zone: zone_1
+configurator_url: http://your-device-ip/
+use_yaml_targets: true
+targets:
+  - name: T1
+    color: "#ff6b7a"
+    x: your_sensor_for_t1_x
+    y: your_sensor_for_t1_y
+  - name: T2
+    color: "#ffd166"
+    x: your_sensor_for_t2_x
+    y: your_sensor_for_t2_y
+  - name: T3
+    color: "#06d6a0"
+    x: your_sensor_for_t3_x
+    y: your_sensor_for_t3_y
