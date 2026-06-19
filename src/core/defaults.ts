@@ -11,7 +11,6 @@ export const DEFAULT_CARD_CONFIG: RadarCardConfig = {
   device_id: "",
   configurator_url: "",
   use_yaml_targets: undefined,
-  selected_zone: "zone_1",
   zone_names: {}
 };
 

@@ -122,8 +122,10 @@ function renderZoneRect(zone: RadarZoneDisplay, viewport: RadarViewport, editabl
   const customName = zone.customName?.trim();
   const handles = editable && zone.selected ? renderZoneHandles(zone, viewport) : "";
 
+  const zoneType = zone.type === "Filter" ? "filter" : zone.type === "Disabled" ? "disabled" : "detection";
+
   return `
-    <g class="zone-rect${zone.selected ? " selected" : ""}${zone.placeholder ? " placeholder" : ""}">
+    <g class="zone-rect ${zoneType}${zone.selected ? " selected" : ""}${zone.placeholder ? " placeholder" : ""}">
       <rect
         x="${topLeft.x}"
         y="${topLeft.y}"

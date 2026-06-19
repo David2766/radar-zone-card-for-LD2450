@@ -10,7 +10,6 @@ var e = {
 	device_id: "",
 	configurator_url: "",
 	use_yaml_targets: void 0,
-	selected_zone: "zone_1",
 	zone_names: {}
 };
 function t(e) {
@@ -136,7 +135,7 @@ function _(e, t, n) {
 	if (a === o || s === c) return "";
 	let l = i(a, c, t), u = i(o, s, t), d = u.x - l.x, f = u.y - l.y, p = l.x + d / 2, m = l.y + Math.max(18, Math.min(f / 2, 34)), h = e.customName?.trim(), g = n && e.selected ? v(e, t) : "";
 	return `
-    <g class="zone-rect${e.selected ? " selected" : ""}${e.placeholder ? " placeholder" : ""}">
+    <g class="zone-rect ${e.type === "Filter" ? "filter" : e.type === "Disabled" ? "disabled" : "detection"}${e.selected ? " selected" : ""}${e.placeholder ? " placeholder" : ""}">
       <rect
         x="${l.x}"
         y="${l.y}"
@@ -223,7 +222,7 @@ var y = class {
 	activeCount(e, t = Date.now()) {
 		return this.activeTargets(e, t).length;
 	}
-}, b = "\n  :host {\n    display: block;\n  }\n  ha-card {\n    overflow: hidden;\n    background: #1f2a33;\n    color: #d7eefc;\n  }\n  .card-header {\n    display: flex;\n    align-items: center;\n    justify-content: space-between;\n    gap: 8px;\n    padding: 12px 14px 4px;\n  }\n  .title {\n    min-width: 0;\n    overflow: hidden;\n    text-overflow: ellipsis;\n    white-space: nowrap;\n    font-size: 16px;\n    font-weight: 600;\n  }\n  .card-actions {\n    display: flex;\n    flex: 0 0 auto;\n    align-items: center;\n    gap: 6px;\n  }\n  .zone-button,\n  .configurator-button,\n  .dialog-close,\n  .danger-button {\n    border: 1px solid rgba(123, 184, 216, 0.42);\n    border-radius: 6px;\n    background: rgba(123, 184, 216, 0.12);\n    color: #d7eefc;\n    cursor: pointer;\n    font: inherit;\n  }\n  .zone-button {\n    flex: 0 0 auto;\n    padding: 5px 8px;\n    font-size: 12px;\n  }\n  .zone-button:hover,\n  .configurator-button:hover,\n  .dialog-close:hover {\n    background: rgba(123, 184, 216, 0.22);\n  }\n  .configurator-button {\n    flex: 0 0 auto;\n    padding: 5px 8px;\n    font-size: 12px;\n  }\n  .danger-button {\n    width: 100%;\n    margin-bottom: 8px;\n    padding: 8px 10px;\n    border-color: rgba(255, 107, 122, 0.48);\n    background: rgba(255, 107, 122, 0.12);\n    color: #ffd7dd;\n    font-size: 13px;\n  }\n  .danger-button:hover {\n    background: rgba(255, 107, 122, 0.2);\n  }\n  .dialog-close {\n    width: 32px;\n    height: 32px;\n    font-size: 18px;\n    line-height: 1;\n  }\n  .dialog-title {\n    padding: 12px 14px 4px;\n    font-size: 16px;\n    font-weight: 600;\n  }\n  svg {\n    display: block;\n    width: 100%;\n    height: auto;\n    background: #1f2a33;\n  }\n  .dialog-map svg {\n    touch-action: none;\n  }\n  .beam {\n    fill: rgba(88, 172, 214, 0.24);\n    stroke: rgba(123, 184, 216, 0.65);\n    stroke-width: 1.4;\n  }\n  .grid line,\n  .grid path {\n    fill: none;\n    stroke: rgba(123, 184, 216, 0.38);\n    stroke-width: 1;\n  }\n  .grid text {\n    fill: rgba(215, 238, 252, 0.55);\n    font-size: 10px;\n    text-anchor: middle;\n    paint-order: stroke;\n    stroke: rgba(31, 42, 51, 0.72);\n    stroke-width: 3px;\n  }\n  .grid .distance-label {\n    text-anchor: start;\n  }\n  .sensor {\n    fill: #ffffff;\n  }\n  .target circle {\n    fill: var(--target-color);\n    stroke: rgba(255, 255, 255, 0.82);\n    stroke-width: 1.5;\n  }\n  .target text {\n    fill: #ffffff;\n    font-size: 13px;\n    font-weight: 700;\n    text-anchor: middle;\n    paint-order: stroke;\n    stroke: rgba(0, 0, 0, 0.45);\n    stroke-width: 3px;\n  }\n  .target.out-of-coverage circle {\n    stroke-dasharray: 3 2;\n  }\n  .zone-rect rect,\n  .zone-rect polygon {\n    fill: rgba(123, 184, 216, 0.08);\n    stroke: rgba(123, 184, 216, 0.55);\n    stroke-width: 1.5;\n    stroke-dasharray: 8 5;\n  }\n  .dialog-map .zone-rect rect {\n    cursor: move;\n    pointer-events: all;\n  }\n  .zone-rect.selected rect {\n    fill: rgba(255, 209, 102, 0.15);\n    stroke: rgba(255, 209, 102, 0.95);\n    stroke-width: 2.2;\n  }\n  .zone-rect.placeholder rect {\n    fill: rgba(255, 209, 102, 0.08);\n    stroke-dasharray: 4 4;\n  }\n  .zone-rect.advanced polygon {\n    stroke-dasharray: 8 5;\n  }\n  .zone-rect.advanced.detection polygon {\n    fill: rgba(255, 209, 102, 0.1);\n    stroke: rgba(255, 209, 102, 0.9);\n  }\n  .zone-rect.advanced.filter polygon {\n    fill: rgba(255, 107, 122, 0.1);\n    stroke: rgba(255, 107, 122, 0.9);\n  }\n  .zone-rect.advanced.reduced polygon {\n    fill: rgba(123, 184, 216, 0.12);\n    stroke: rgba(123, 184, 216, 0.9);\n  }\n  .zone-rect.advanced.calibration polygon {\n    stroke-dasharray: 3 4;\n  }\n  .zone-rect.advanced.calibration text {\n    fill: #ffd7dd;\n  }\n  .zone-rect.advanced.disabled polygon {\n    fill: rgba(160, 174, 184, 0.06);\n    stroke: rgba(160, 174, 184, 0.62);\n  }\n  .zone-rect text {\n    fill: rgba(215, 238, 252, 0.88);\n    font-size: 12px;\n    font-weight: 700;\n    text-anchor: middle;\n    pointer-events: none;\n    paint-order: stroke;\n    stroke: rgba(0, 0, 0, 0.5);\n    stroke-width: 3px;\n  }\n  .zone-rect.selected text {\n    fill: #fff3c4;\n  }\n  .zone-handle {\n    fill: #fff3c4;\n    stroke: rgba(31, 42, 51, 0.95);\n    stroke-width: 2;\n    cursor: grab;\n    pointer-events: all;\n  }\n  .zone-handle:active {\n    cursor: grabbing;\n  }\n  .message {\n    margin: 0 12px 12px;\n    padding: 10px 12px;\n    border-radius: 8px;\n    font-size: 13px;\n    line-height: 1.45;\n  }\n  .message-title {\n    font-weight: 700;\n    margin-bottom: 4px;\n  }\n  .message.error {\n    background: rgba(255, 107, 122, 0.16);\n    border: 1px solid rgba(255, 107, 122, 0.5);\n  }\n  .message.warning {\n    background: rgba(255, 209, 102, 0.14);\n    border: 1px solid rgba(255, 209, 102, 0.45);\n  }\n  .message.info {\n    background: rgba(123, 184, 216, 0.12);\n    border: 1px solid rgba(123, 184, 216, 0.36);\n  }\n  .dialog-backdrop {\n    position: fixed;\n    inset: 0;\n    z-index: 2147483640;\n    display: flex;\n    align-items: center;\n    justify-content: center;\n    padding: 18px;\n    background: rgba(5, 12, 18, 0.72);\n  }\n  .dialog {\n    width: min(960px, 100%);\n    max-height: min(760px, calc(100vh - 36px));\n    overflow: auto;\n    border: 1px solid rgba(123, 184, 216, 0.34);\n    border-radius: 8px;\n    background: #1f2a33;\n    color: #d7eefc;\n    box-shadow: 0 24px 72px rgba(0, 0, 0, 0.48);\n  }\n  .dialog-header {\n    display: flex;\n    align-items: center;\n    justify-content: space-between;\n    gap: 12px;\n    padding: 12px 14px;\n    border-bottom: 1px solid rgba(123, 184, 216, 0.18);\n  }\n  .dialog-heading {\n    min-width: 0;\n  }\n  .dialog-heading-title {\n    font-size: 17px;\n    font-weight: 700;\n  }\n  .dialog-heading-subtitle {\n    margin-top: 2px;\n    font-size: 12px;\n    color: rgba(215, 238, 252, 0.7);\n  }\n  .dialog-body {\n    display: grid;\n    grid-template-columns: minmax(0, 1fr) 220px;\n    gap: 14px;\n    padding: 14px;\n  }\n  .dialog-map {\n    min-width: 0;\n    border: 1px solid rgba(123, 184, 216, 0.18);\n    border-radius: 8px;\n    overflow: hidden;\n  }\n  .dialog-panel {\n    display: grid;\n    align-content: start;\n    gap: 10px;\n  }\n  .panel-section {\n    padding: 10px;\n    border: 1px solid rgba(123, 184, 216, 0.18);\n    border-radius: 8px;\n    background: rgba(123, 184, 216, 0.08);\n  }\n  .panel-section-warning {\n    border-color: rgba(255, 209, 102, 0.42);\n    background: rgba(255, 209, 102, 0.12);\n  }\n  .panel-button {\n    width: 100%;\n  }\n  .panel-label {\n    margin-bottom: 4px;\n    font-size: 11px;\n    color: rgba(215, 238, 252, 0.62);\n  }\n  .panel-value {\n    font-size: 14px;\n    font-weight: 700;\n  }\n  .panel-note {\n    font-size: 12px;\n    line-height: 1.45;\n    color: rgba(215, 238, 252, 0.74);\n  }\n  .zone-segments {\n    display: grid;\n    grid-template-columns: repeat(3, 1fr);\n    gap: 6px;\n  }\n  .zone-segment {\n    display: grid;\n    gap: 2px;\n    min-width: 0;\n    padding: 7px 4px;\n    border: 1px solid rgba(123, 184, 216, 0.24);\n    border-radius: 6px;\n    background: rgba(123, 184, 216, 0.08);\n    color: #d7eefc;\n    cursor: pointer;\n    font: inherit;\n    text-align: center;\n    font-size: 12px;\n  }\n  .zone-segment-custom {\n    min-width: 0;\n    overflow: hidden;\n    color: rgba(215, 238, 252, 0.68);\n    font-size: 10px;\n    font-weight: 400;\n    text-overflow: ellipsis;\n    white-space: nowrap;\n  }\n  .zone-segment.active .zone-segment-custom {\n    color: rgba(255, 243, 196, 0.78);\n  }\n  .zone-name-input {\n    width: 100%;\n    box-sizing: border-box;\n    padding: 8px 9px;\n    border: 1px solid rgba(123, 184, 216, 0.26);\n    border-radius: 6px;\n    background: rgba(5, 12, 18, 0.18);\n    color: #d7eefc;\n    font: inherit;\n    font-size: 13px;\n  }\n  .zone-name-input:focus {\n    border-color: rgba(255, 209, 102, 0.75);\n    outline: none;\n  }\n  .zone-segment:hover {\n    background: rgba(123, 184, 216, 0.18);\n  }\n  .zone-segment.active {\n    border-color: rgba(255, 209, 102, 0.72);\n    background: rgba(255, 209, 102, 0.16);\n    color: #fff3c4;\n  }\n  @media (max-width: 720px) {\n    .dialog-backdrop {\n      align-items: stretch;\n      padding: 10px;\n    }\n    .dialog {\n      max-height: calc(100vh - 20px);\n    }\n    .dialog-body {\n      grid-template-columns: 1fr;\n    }\n  }\n";
+}, b = "\n  :host {\n    display: block;\n  }\n  ha-card {\n    overflow: hidden;\n    background: #1f2a33;\n    color: #d7eefc;\n  }\n  .card-header {\n    display: flex;\n    align-items: center;\n    justify-content: space-between;\n    gap: 8px;\n    padding: 12px 14px 4px;\n  }\n  .title {\n    min-width: 0;\n    overflow: hidden;\n    text-overflow: ellipsis;\n    white-space: nowrap;\n    font-size: 16px;\n    font-weight: 600;\n  }\n  .card-actions {\n    display: flex;\n    flex: 0 0 auto;\n    align-items: center;\n    gap: 6px;\n  }\n  .zone-button,\n  .configurator-button,\n  .dialog-close,\n  .danger-button {\n    border: 1px solid rgba(123, 184, 216, 0.42);\n    border-radius: 6px;\n    background: rgba(123, 184, 216, 0.12);\n    color: #d7eefc;\n    cursor: pointer;\n    font: inherit;\n  }\n  .zone-button {\n    flex: 0 0 auto;\n    padding: 5px 8px;\n    font-size: 12px;\n  }\n  .zone-button:hover,\n  .configurator-button:hover,\n  .dialog-close:hover {\n    background: rgba(123, 184, 216, 0.22);\n  }\n  .configurator-button {\n    flex: 0 0 auto;\n    padding: 5px 8px;\n    font-size: 12px;\n  }\n  .danger-button {\n    width: 100%;\n    margin-bottom: 8px;\n    padding: 8px 10px;\n    border-color: rgba(255, 107, 122, 0.48);\n    background: rgba(255, 107, 122, 0.12);\n    color: #ffd7dd;\n    font-size: 13px;\n  }\n  .danger-button:hover {\n    background: rgba(255, 107, 122, 0.2);\n  }\n  .dialog-close {\n    width: 32px;\n    height: 32px;\n    font-size: 18px;\n    line-height: 1;\n  }\n  .dialog-title {\n    padding: 12px 14px 4px;\n    font-size: 16px;\n    font-weight: 600;\n  }\n  svg {\n    display: block;\n    width: 100%;\n    height: auto;\n    background: #1f2a33;\n  }\n  .dialog-map svg {\n    touch-action: none;\n  }\n  .beam {\n    fill: rgba(88, 172, 214, 0.24);\n    stroke: rgba(123, 184, 216, 0.65);\n    stroke-width: 1.4;\n  }\n  .grid line,\n  .grid path {\n    fill: none;\n    stroke: rgba(123, 184, 216, 0.38);\n    stroke-width: 1;\n  }\n  .grid text {\n    fill: rgba(215, 238, 252, 0.55);\n    font-size: 10px;\n    text-anchor: middle;\n    paint-order: stroke;\n    stroke: rgba(31, 42, 51, 0.72);\n    stroke-width: 3px;\n  }\n  .grid .distance-label {\n    text-anchor: start;\n  }\n  .sensor {\n    fill: #ffffff;\n  }\n  .target circle {\n    fill: var(--target-color);\n    stroke: rgba(255, 255, 255, 0.82);\n    stroke-width: 1.5;\n  }\n  .target text {\n    fill: #ffffff;\n    font-size: 13px;\n    font-weight: 700;\n    text-anchor: middle;\n    paint-order: stroke;\n    stroke: rgba(0, 0, 0, 0.45);\n    stroke-width: 3px;\n  }\n  .target.out-of-coverage circle {\n    stroke-dasharray: 3 2;\n  }\n  .zone-rect rect,\n  .zone-rect polygon {\n    fill: rgba(123, 184, 216, 0.08);\n    stroke: rgba(123, 184, 216, 0.55);\n    stroke-width: 1.5;\n    stroke-dasharray: 8 5;\n  }\n  .zone-rect.detection rect {\n    fill: rgba(255, 209, 102, 0.09);\n    stroke: rgba(255, 209, 102, 0.68);\n  }\n  .zone-rect.filter rect {\n    fill: rgba(255, 107, 122, 0.1);\n    stroke: rgba(255, 107, 122, 0.74);\n  }\n  .zone-rect.disabled rect {\n    fill: rgba(160, 174, 184, 0.06);\n    stroke: rgba(160, 174, 184, 0.52);\n    stroke-dasharray: 3 5;\n  }\n  .dialog-map .zone-rect rect {\n    cursor: move;\n    pointer-events: all;\n  }\n  .zone-rect.selected rect {\n    fill: rgba(255, 209, 102, 0.15);\n    stroke: rgba(255, 209, 102, 0.95);\n    stroke-width: 2.2;\n  }\n  .zone-rect.selected.filter rect {\n    fill: rgba(255, 107, 122, 0.18);\n    stroke: rgba(255, 107, 122, 0.98);\n  }\n  .zone-rect.selected.disabled rect {\n    fill: rgba(160, 174, 184, 0.14);\n    stroke: rgba(215, 238, 252, 0.72);\n  }\n  .zone-rect.placeholder rect {\n    fill: rgba(215, 238, 252, 0.05);\n    stroke-dasharray: 4 4;\n  }\n  .zone-rect.advanced polygon {\n    stroke-dasharray: 8 5;\n  }\n  .zone-rect.advanced.detection polygon {\n    fill: rgba(255, 209, 102, 0.1);\n    stroke: rgba(255, 209, 102, 0.9);\n  }\n  .zone-rect.advanced.filter polygon {\n    fill: rgba(255, 107, 122, 0.1);\n    stroke: rgba(255, 107, 122, 0.9);\n  }\n  .zone-rect.advanced.reduced polygon {\n    fill: rgba(123, 184, 216, 0.12);\n    stroke: rgba(123, 184, 216, 0.9);\n  }\n  .zone-rect.advanced.calibration polygon {\n    stroke-dasharray: 3 4;\n  }\n  .zone-rect.advanced.calibration text {\n    fill: #ffd7dd;\n  }\n  .zone-rect.advanced.disabled polygon {\n    fill: rgba(160, 174, 184, 0.06);\n    stroke: rgba(160, 174, 184, 0.62);\n  }\n  .zone-rect text {\n    fill: rgba(215, 238, 252, 0.88);\n    font-size: 12px;\n    font-weight: 700;\n    text-anchor: middle;\n    pointer-events: none;\n    paint-order: stroke;\n    stroke: rgba(0, 0, 0, 0.5);\n    stroke-width: 3px;\n  }\n  .zone-rect.selected text {\n    fill: #fff3c4;\n  }\n  .zone-handle {\n    fill: #fff3c4;\n    stroke: rgba(31, 42, 51, 0.95);\n    stroke-width: 2;\n    cursor: grab;\n    pointer-events: all;\n  }\n  .zone-handle:active {\n    cursor: grabbing;\n  }\n  .message {\n    margin: 0 12px 12px;\n    padding: 10px 12px;\n    border-radius: 8px;\n    font-size: 13px;\n    line-height: 1.45;\n  }\n  .message-title {\n    font-weight: 700;\n    margin-bottom: 4px;\n  }\n  .message.error {\n    background: rgba(255, 107, 122, 0.16);\n    border: 1px solid rgba(255, 107, 122, 0.5);\n  }\n  .message.warning {\n    background: rgba(255, 209, 102, 0.14);\n    border: 1px solid rgba(255, 209, 102, 0.45);\n  }\n  .message.info {\n    background: rgba(123, 184, 216, 0.12);\n    border: 1px solid rgba(123, 184, 216, 0.36);\n  }\n  .dialog-backdrop {\n    position: fixed;\n    inset: 0;\n    z-index: 2147483640;\n    display: flex;\n    align-items: center;\n    justify-content: center;\n    padding: 18px;\n    background: rgba(5, 12, 18, 0.72);\n  }\n  .dialog {\n    width: min(960px, 100%);\n    max-height: min(760px, calc(100vh - 36px));\n    overflow: auto;\n    border: 1px solid rgba(123, 184, 216, 0.34);\n    border-radius: 8px;\n    background: #1f2a33;\n    color: #d7eefc;\n    box-shadow: 0 24px 72px rgba(0, 0, 0, 0.48);\n  }\n  .dialog-header {\n    display: flex;\n    align-items: center;\n    justify-content: space-between;\n    gap: 12px;\n    padding: 12px 14px;\n    border-bottom: 1px solid rgba(123, 184, 216, 0.18);\n  }\n  .dialog-heading {\n    min-width: 0;\n  }\n  .dialog-heading-title {\n    font-size: 17px;\n    font-weight: 700;\n  }\n  .dialog-heading-subtitle {\n    margin-top: 2px;\n    font-size: 12px;\n    color: rgba(215, 238, 252, 0.7);\n  }\n  .dialog-body {\n    display: grid;\n    grid-template-columns: minmax(0, 1fr) 220px;\n    gap: 14px;\n    padding: 14px;\n  }\n  .dialog-map {\n    min-width: 0;\n    border: 1px solid rgba(123, 184, 216, 0.18);\n    border-radius: 8px;\n    overflow: hidden;\n  }\n  .dialog-panel {\n    display: grid;\n    align-content: start;\n    gap: 10px;\n  }\n  .panel-section {\n    padding: 10px;\n    border: 1px solid rgba(123, 184, 216, 0.18);\n    border-radius: 8px;\n    background: rgba(123, 184, 216, 0.08);\n  }\n  .panel-section-warning {\n    border-color: rgba(255, 209, 102, 0.42);\n    background: rgba(255, 209, 102, 0.12);\n  }\n  .panel-button {\n    width: 100%;\n  }\n  .panel-label {\n    margin-bottom: 4px;\n    font-size: 11px;\n    color: rgba(215, 238, 252, 0.62);\n  }\n  .panel-value {\n    font-size: 14px;\n    font-weight: 700;\n  }\n  .panel-note {\n    font-size: 12px;\n    line-height: 1.45;\n    color: rgba(215, 238, 252, 0.74);\n  }\n  .zone-segments {\n    display: grid;\n    grid-template-columns: repeat(3, 1fr);\n    gap: 6px;\n  }\n  .zone-segment {\n    display: grid;\n    gap: 2px;\n    min-width: 0;\n    padding: 7px 4px;\n    border: 1px solid rgba(123, 184, 216, 0.24);\n    border-radius: 6px;\n    background: rgba(123, 184, 216, 0.08);\n    color: #d7eefc;\n    cursor: pointer;\n    font: inherit;\n    text-align: center;\n    font-size: 12px;\n  }\n  .zone-segment-custom {\n    min-width: 0;\n    overflow: hidden;\n    color: rgba(215, 238, 252, 0.68);\n    font-size: 10px;\n    font-weight: 400;\n    text-overflow: ellipsis;\n    white-space: nowrap;\n  }\n  .zone-segment.active .zone-segment-custom {\n    color: rgba(255, 243, 196, 0.78);\n  }\n  .zone-name-input {\n    width: 100%;\n    box-sizing: border-box;\n    padding: 8px 9px;\n    border: 1px solid rgba(123, 184, 216, 0.26);\n    border-radius: 6px;\n    background: rgba(5, 12, 18, 0.18);\n    color: #d7eefc;\n    font: inherit;\n    font-size: 13px;\n  }\n  .zone-name-input:focus {\n    border-color: rgba(255, 209, 102, 0.75);\n    outline: none;\n  }\n  .zone-type-buttons {\n    display: grid;\n    grid-template-columns: repeat(3, minmax(0, 1fr));\n    gap: 6px;\n    margin-bottom: 8px;\n  }\n  .zone-type-button {\n    min-width: 0;\n    padding: 7px 4px;\n    border: 1px solid rgba(123, 184, 216, 0.24);\n    border-radius: 6px;\n    background: rgba(123, 184, 216, 0.08);\n    color: #d7eefc;\n    cursor: pointer;\n    font: inherit;\n    font-size: 12px;\n  }\n  .zone-type-button:hover {\n    background: rgba(123, 184, 216, 0.18);\n  }\n  .zone-type-button.detection.selected {\n    border-color: rgba(255, 209, 102, 0.72);\n    background: rgba(255, 209, 102, 0.16);\n    color: #fff3c4;\n  }\n  .zone-type-button.filter.selected {\n    border-color: rgba(255, 107, 122, 0.72);\n    background: rgba(255, 107, 122, 0.16);\n    color: #ffd7dd;\n  }\n  .zone-type-button.disabled.selected {\n    border-color: rgba(160, 174, 184, 0.6);\n    background: rgba(160, 174, 184, 0.12);\n    color: rgba(215, 238, 252, 0.72);\n  }\n  .zone-segment:hover {\n    background: rgba(123, 184, 216, 0.18);\n  }\n  .zone-segment.active {\n    border-color: rgba(255, 209, 102, 0.72);\n    background: rgba(255, 209, 102, 0.16);\n    color: #fff3c4;\n  }\n  @media (max-width: 720px) {\n    .dialog-backdrop {\n      align-items: stretch;\n      padding: 10px;\n    }\n    .dialog {\n      max-height: calc(100vh - 20px);\n    }\n    .dialog-body {\n      grid-template-columns: 1fr;\n    }\n  }\n";
 //#endregion
 //#region src/ha/ha-target-source.ts
 function x(e) {
@@ -231,10 +230,10 @@ function x(e) {
 	return !!(e.use_yaml_targets ?? t);
 }
 function S(e, t) {
-	return x(e) ? R(e.targets) : !t || !e.device_id ? [] : C(e.device_id, t);
+	return x(e) ? z(e.targets) : !t || !e.device_id ? [] : C(e.device_id, t);
 }
 function C(e, n) {
-	let r = I(e, n), i = [];
+	let r = L(e, n), i = [];
 	for (let e = 1; e <= 3; e += 1) {
 		let n = E(r, e, "x"), a = E(r, e, "y");
 		n && a && i.push({
@@ -247,7 +246,7 @@ function C(e, n) {
 	return i;
 }
 function w(e, t, n) {
-	let r = { zoneId: t }, i = Number(t.replace("zone_", "")), a = I(e, n);
+	let r = { zoneId: t }, i = Number(t.replace("zone_", "")), a = L(e, n);
 	for (let e of [
 		"x1",
 		"y1",
@@ -257,18 +256,19 @@ function w(e, t, n) {
 	return r.name = O(a, i) || void 0, r;
 }
 function T(e, t) {
-	let n = I(e, t);
+	let n = L(e, t);
 	return {
 		ipAddress: k(n) || void 0,
 		customZoneConfigured: A(n) || void 0,
 		zoneSummary: j(n) || void 0,
 		zoneConfigJson: M(n) || void 0,
-		softwareZoneConfigs: N(n),
-		calibrationZoneConfigs: P(n)
+		zoneType: N(n) || void 0,
+		softwareZoneConfigs: P(n),
+		calibrationZoneConfigs: F(n)
 	};
 }
 function E(e, t, n) {
-	return L(e, [
+	return R(e, [
 		`tages${t}_${n}`,
 		`target_${t}_${n}`,
 		`target${t}_${n}`,
@@ -276,62 +276,69 @@ function E(e, t, n) {
 		`target_${t}_${n}_display`,
 		`타겟${t} ${n}`,
 		`타겟${t}_${n}`
-	].map((e) => F(e)));
+	].map((e) => I(e)));
 }
 function D(e, t, n) {
-	return L(e, [
+	return R(e, [
 		`zone${t}${n}`,
 		`zone_${t}_${n}`,
 		`zone-${t}-${n}`,
 		`zone ${t} ${n}`
-	].map((e) => F(e)));
+	].map((e) => I(e)));
 }
 function O(e, t) {
-	return L(e, [
+	return R(e, [
 		`zone${t}name`,
 		`zone_${t}_name`,
 		`zone-${t}-name`,
 		`zone ${t} name`
-	].map((e) => F(e)));
+	].map((e) => I(e)));
 }
 function k(e) {
-	return L(e, [
+	return R(e, [
 		"deviceipaddress",
 		"ipaddress",
 		"wifiip",
 		"wifiinfoipaddress"
-	].map((e) => F(e)));
+	].map((e) => I(e)));
 }
 function A(e) {
-	return L(e, [
+	return R(e, [
 		"customzoneconfigured",
 		"advancedzoneconfigured",
 		"zoneconfigured"
-	].map((e) => F(e)));
+	].map((e) => I(e)));
 }
 function j(e) {
-	return L(e, ["zonesummary", "zoneconfigsummary"].map((e) => F(e)));
+	return R(e, ["zonesummary", "zoneconfigsummary"].map((e) => I(e)));
 }
 function M(e) {
-	return L(e, [
+	return R(e, [
 		"zoneconfigjson",
 		"zonejson",
 		"advancedzoneconfig"
-	].map((e) => F(e)));
+	].map((e) => I(e)));
 }
 function N(e) {
+	return R(e, [
+		"ld2450zonetype",
+		"zonetype",
+		"zone type"
+	].map((e) => I(e)));
+}
+function P(e) {
 	let t = [];
 	for (let n = 1; n <= 6; n += 1) {
 		let r = [
 			`softwarezone${n}config`,
 			`software_zone_${n}_config`,
 			`software zone ${n} config`
-		].map((e) => F(e));
-		t.push(L(e, r) || "");
+		].map((e) => I(e));
+		t.push(R(e, r) || "");
 	}
 	return t;
 }
-function P(e) {
+function F(e) {
 	let t = [];
 	for (let n = 1; n <= 4; n += 1) {
 		let r = [
@@ -340,22 +347,22 @@ function P(e) {
 			`calibration filter ${n} config`,
 			`calibration${n}config`,
 			`calibration_${n}_config`
-		].map((e) => F(e));
-		t.push(L(e, r) || "");
+		].map((e) => I(e));
+		t.push(R(e, r) || "");
 	}
 	return t;
 }
-function F(e) {
+function I(e) {
 	return String(e || "").toLowerCase().replace(/[^a-z0-9가-힣]/g, "");
 }
-function I(e, t) {
-	let n = t.entities;
-	return !n || typeof n != "object" ? [] : Object.entries(n).map(([e, t]) => z(e, t)).filter((n) => n.device_id === e && t.states[n.entity_id]);
-}
 function L(e, t) {
+	let n = t.entities;
+	return !n || typeof n != "object" ? [] : Object.entries(n).map(([e, t]) => B(e, t)).filter((n) => n.device_id === e && t.states[n.entity_id]);
+}
+function R(e, t) {
 	let n = null, r = -1;
 	for (let i of e) {
-		let e = F([
+		let e = I([
 			i.entity_id,
 			i.name,
 			i.original_name
@@ -368,7 +375,7 @@ function L(e, t) {
 	}
 	return n;
 }
-function R(e) {
+function z(e) {
 	return e.map((e, n) => ({
 		name: e.name || `T${n + 1}`,
 		color: e.color || t(n),
@@ -376,7 +383,7 @@ function R(e) {
 		y: e.y
 	}));
 }
-function z(e, t) {
+function B(e, t) {
 	return {
 		entity_id: t?.entity_id || e,
 		device_id: t?.device_id,
@@ -386,9 +393,11 @@ function z(e, t) {
 }
 //#endregion
 //#region src/ha/radar-zone-card.ts
-var B = class extends HTMLElement {
+var V = class extends HTMLElement {
 	constructor() {
-		super(), this.config = null, this.hassValue = null, this.targetStore = new y(), this.errors = [], this.warnings = [], this.resolvedTargets = [], this.zoneDialogOpen = !1, this.zoneDrafts = {}, this.zoneDrag = null, this.handleZoneDragMove = (e) => {
+		super(), this.config = null, this.hassValue = null, this.targetStore = new y(), this.errors = [], this.warnings = [], this.resolvedTargets = [], this.zoneDialogOpen = !1, this.selectedZoneId = null, this.zoneDrafts = {}, this.zoneDrag = null, this.zoneDialogKeyListenerAttached = !1, this.handleZoneDialogKeyDown = (e) => {
+			!this.zoneDialogOpen || this.hasAdvancedZoneConfig() || !this.selectedZoneId || e.composedPath().some((e) => e instanceof HTMLElement ? !!(e.closest("input,textarea,select") || e.isContentEditable) : !1) || e.key !== "Delete" && e.key !== "Backspace" || (e.preventDefault(), this.deleteSelectedZone());
+		}, this.handleZoneDragMove = (e) => {
 			if (!this.zoneDrag || e.pointerId !== this.zoneDrag.pointerId) return;
 			let t = this.shadowRoot?.querySelector("[data-radar-dialog-map] svg"), n = t ? this.pointerToRadarPoint(e, t) : null;
 			if (!n) return;
@@ -401,6 +410,9 @@ var B = class extends HTMLElement {
 			let t = this.zoneDrag.zoneId;
 			this.zoneDrag = null, window.removeEventListener("pointermove", this.handleZoneDragMove), window.removeEventListener("pointerup", this.handleZoneDragEnd), window.removeEventListener("pointercancel", this.handleZoneDragEnd), this.commitZoneRect(t), this.render();
 		}, this.attachShadow({ mode: "open" });
+	}
+	disconnectedCallback() {
+		this.detachZoneDialogKeyListener();
 	}
 	static getStubConfig() {
 		return {
@@ -460,14 +472,15 @@ var B = class extends HTMLElement {
 		};
 	}
 	selectedZoneRect() {
-		return this.config ? this.zoneRect(this.config.selected_zone) : null;
+		let e = this.activeZoneId();
+		return e ? this.zoneRect(e) : null;
 	}
 	isEmptyZoneRect(e) {
 		return e ? e.x1 === e.x2 || e.y1 === e.y2 : !0;
 	}
 	editableZoneRect(e) {
 		let t = this.zoneRect(e);
-		return this.hasAdvancedZoneConfig() || !this.isEmptyZoneRect(t) ? t : e !== this.config?.selected_zone || !this.zoneDialogOpen ? null : this.defaultZoneRect(e);
+		return this.hasAdvancedZoneConfig() || !this.isEmptyZoneRect(t) ? t : e !== this.activeZoneId() || !this.zoneDialogOpen ? null : this.defaultZoneRect(e);
 	}
 	defaultZoneRect(e) {
 		let t = this.zoneBounds(e), n = t?.x.min ?? -1e3, r = t?.x.max ?? 1e3, i = t?.y.min ?? 0, a = t?.y.max ?? 2e3, o = Math.min(1200, Math.max(400, r - n)), s = Math.min(1200, Math.max(400, a - i)), c = this.clamp(0, n + o / 2, r - o / 2), l = this.clamp(800, i, Math.max(i, a - s));
@@ -486,8 +499,15 @@ var B = class extends HTMLElement {
 	zoneNameEntity(e) {
 		return !this.config?.device_id || !this.hassValue ? null : w(this.config.device_id, e, this.hassValue).name || null;
 	}
+	activeZoneId() {
+		return this.zoneDialogOpen ? this.selectedZoneId : null;
+	}
 	deviceEntity(e) {
 		return !this.config?.device_id || !this.hassValue ? null : T(this.config.device_id, this.hassValue)[e] || null;
+	}
+	ld2450ZoneType() {
+		let e = this.entityState(this.deviceEntity("zoneType"));
+		return e === "Filter" || e === "Disabled" ? e : "Detection";
 	}
 	entityState(e) {
 		return e && this.hassValue?.states[e]?.state?.trim() || "";
@@ -555,19 +575,20 @@ var B = class extends HTMLElement {
 	}
 	zoneDisplays() {
 		if (!this.config) return [];
-		let e = this.hasAdvancedZoneDataConfig();
+		let e = this.hasAdvancedZoneDataConfig(), t = this.activeZoneId(), r = this.ld2450ZoneType();
 		return [
 			"zone_1",
 			"zone_2",
 			"zone_3"
-		].map((t) => {
-			let r = this.zoneRect(t), i = e ? r : this.editableZoneRect(t);
-			return i ? {
-				...i,
-				label: n(t),
-				customName: this.zoneCustomName(t),
-				selected: t === this.config?.selected_zone,
-				placeholder: !e && this.isEmptyZoneRect(r)
+		].map((i) => {
+			let a = this.zoneRect(i), o = e ? a : this.editableZoneRect(i);
+			return o ? {
+				...o,
+				label: n(i),
+				customName: this.zoneCustomName(i),
+				type: r,
+				selected: i === t,
+				placeholder: !e && this.isEmptyZoneRect(a)
 			} : null;
 		}).filter((e) => e !== null);
 	}
@@ -660,19 +681,31 @@ var B = class extends HTMLElement {
 	}
 	zoneDialogMarkup() {
 		if (!this.config || !this.zoneDialogOpen) return "";
-		let e = [
+		let e = this.activeZoneId(), t = [
 			["zone_1", "1"],
 			["zone_2", "2"],
 			["zone_3", "3"]
-		].map(([e, t]) => {
-			let n = e === this.config?.selected_zone ? " active" : "", i = this.zoneCustomName(e);
+		].map(([t, n]) => {
+			let i = t === e ? " active" : "", a = this.zoneCustomName(t);
 			return `
-          <button class="zone-segment${n}" type="button" data-zone-select="${e}">
-            <span>Zone ${t}</span>
-            ${i ? `<span class="zone-segment-custom">${r(i)}</span>` : ""}
+          <button class="zone-segment${i}" type="button" data-zone-select="${t}">
+            <span>Zone ${n}</span>
+            ${a ? `<span class="zone-segment-custom">${r(a)}</span>` : ""}
           </button>
         `;
-		}).join(""), t = this.selectedZoneRect(), n = this.isEmptyZoneRect(t), i = this.zoneCustomName(this.config.selected_zone), a = this.hasAdvancedZoneConfig(), o = t ? n ? "아직 설정되지 않았습니다. 지도에 표시된 기본 박스를 끌어서 새 Zone을 만드세요." : `X ${t.x1} ~ ${t.x2} mm / Y ${t.y1} ~ ${t.y2} mm` : "선택한 Zone 좌표 엔티티를 찾지 못했거나 값이 없습니다.", s = `
+		}).join(""), n = this.selectedZoneRect(), i = this.isEmptyZoneRect(n), a = e ? this.zoneCustomName(e) : "", o = this.hasAdvancedZoneConfig(), s = this.ld2450ZoneType(), c = this.deviceEntity("zoneType") ? [
+			"Detection",
+			"Filter",
+			"Disabled"
+		].map((e) => `
+              <button
+                class="zone-type-button ${e.toLowerCase()}${s === e ? " selected" : ""}"
+                type="button"
+                data-ld2450-zone-type="${e}"
+              >
+                ${e === "Detection" ? "탐지" : e === "Filter" ? "제외" : "비활성화"}
+              </button>
+            `).join("") : "", l = e ? n ? i ? "아직 설정되지 않았습니다. 지도에 표시된 기본 박스를 끌어서 새 Zone을 만드세요." : `X ${n.x1} ~ ${n.x2} mm / Y ${n.y1} ~ ${n.y2} mm` : "선택한 Zone 좌표 엔티티를 찾지 못했거나 값이 없습니다." : "선택된 Zone이 없습니다.", u = `
       <div class="panel-section panel-section-warning">
         <div class="panel-label">고급 Zone 설정</div>
         <div class="panel-note">기기 웹 설정에서 저장한 Zone 설정이 적용되어 있습니다. 이 카드에서는 편집할 수 없고 현재 설정만 표시합니다.</div>
@@ -682,29 +715,36 @@ var B = class extends HTMLElement {
         <div class="panel-note">${r(this.deviceZoneSummary())}</div>
       </div>
       ${this.configuratorUrl() ? "<div class=\"panel-section\"><button class=\"configurator-button panel-button\" type=\"button\" data-configurator-open>고급 Zone 설정 열기</button></div>" : ""}
-    `, c = `
+    `, d = e ? `
+        <div class="panel-section">
+          <label class="panel-label" for="zone-name-input">커스텀 이름</label>
+          <input
+            id="zone-name-input"
+            class="zone-name-input"
+            data-zone-name-input
+            value="${r(a)}"
+            placeholder="예: 침대, 책상 앞"
+          />
+        </div>
+        <div class="panel-section">
+          <button class="danger-button" type="button" data-zone-delete>선택 Zone 삭제</button>
+          <div class="panel-note">좌표를 0으로 초기화합니다. 다시 만들려면 지도에 표시된 기본 박스를 끌어 저장하세요.</div>
+        </div>
+      ` : "\n        <div class=\"panel-section\">\n          <div class=\"panel-label\">Zone 편집</div>\n          <div class=\"panel-note\">왼쪽 목록이나 레이더 지도에서 Zone을 선택하면 이름과 좌표를 편집할 수 있습니다.</div>\n        </div>\n      ", f = `
       <div class="panel-section">
-        <div class="panel-label">Zone 좌표</div>
-        <div class="panel-note">${r(o)}</div>
+        <div class="panel-label">전체 Zone 동작</div>
+        ${c ? `<div class="zone-type-buttons">${c}</div>
+               <div class="panel-note">LD2450 기본 컴포넌트의 Zone Type입니다. 선택한 모드는 Zone 1/2/3 전체에 일괄 적용됩니다.</div>` : "<div class=\"panel-note\">이 기기에서 LD2450 Zone Type 엔티티를 찾지 못했습니다.</div>"}
       </div>
       <div class="panel-section">
-        <label class="panel-label" for="zone-name-input">커스텀 이름</label>
-        <input
-          id="zone-name-input"
-          class="zone-name-input"
-          data-zone-name-input
-          value="${r(i)}"
-          placeholder="예: 침대, 책상 앞"
-        />
+        <div class="panel-label">Zone 좌표</div>
+        <div class="panel-note">${r(l)}</div>
       </div>
       <div class="panel-section">
         <div class="panel-label">Zone 선택</div>
-        <div class="zone-segments">${e}</div>
+        <div class="zone-segments">${t}</div>
       </div>
-      <div class="panel-section">
-        <button class="danger-button" type="button" data-zone-delete>선택 Zone 삭제</button>
-        <div class="panel-note">좌표를 0으로 초기화합니다. 다시 만들려면 지도에 표시된 기본 박스를 끌어 저장하세요.</div>
-      </div>
+      ${d}
     `;
 		return `
       <div class="dialog-backdrop" data-dialog-backdrop>
@@ -716,12 +756,12 @@ var B = class extends HTMLElement {
             </div>
             <button class="dialog-close" type="button" data-dialog-close aria-label="닫기">×</button>
           </div>
-          <div class="dialog-body">
+          <div class="dialog-body" data-dialog-body>
             <div class="dialog-map" data-radar-dialog-map>
-              ${this.radarSvgMarkup(720, 520, 32, !a)}
+              ${this.radarSvgMarkup(720, 520, 32, !o)}
             </div>
             <div class="dialog-panel">
-              ${a ? s : c}
+              ${o ? u : f}
             </div>
           </div>
         </div>
@@ -729,41 +769,29 @@ var B = class extends HTMLElement {
     `;
 	}
 	openZoneDialog() {
-		this.zoneDialogOpen = !0, this.render();
+		this.selectedZoneId = null, this.zoneDialogOpen = !0, this.attachZoneDialogKeyListener(), this.render();
 	}
 	closeZoneDialog() {
-		this.hasAdvancedZoneConfig() || this.commitZoneNameInput(), this.zoneDialogOpen = !1, this.render();
+		this.hasAdvancedZoneConfig() || this.commitZoneNameInput(), this.zoneDialogOpen = !1, this.selectedZoneId = null, this.detachZoneDialogKeyListener(), this.render();
 	}
 	selectZone(e) {
-		this.config && (this.hasAdvancedZoneConfig() || this.commitZoneNameInput(), this.config = {
-			...this.config,
-			selected_zone: e
-		}, this.dispatchEvent(new CustomEvent("config-changed", {
-			detail: { config: this.config },
-			bubbles: !0,
-			composed: !0
-		})), this.render());
+		this.config && (this.hasAdvancedZoneConfig() || this.commitZoneNameInput(), this.selectedZoneId = e, this.render());
 	}
 	async deleteSelectedZone() {
 		if (!this.config || this.hasAdvancedZoneConfig()) return;
-		this.commitZoneNameInput();
-		let e = this.config.selected_zone;
-		this.zoneDrafts[e] = {
+		let e = this.activeZoneId();
+		e && (this.zoneDrafts[e] = {
 			zoneId: e,
 			x1: 0,
 			y1: 0,
 			x2: 0,
 			y2: 0
-		}, await this.commitZoneRect(e), this.render();
+		}, await this.commitZoneRect(e), await this.setZoneName(e, ""), this.render());
 	}
-	commitZoneNameInput() {
+	async commitZoneNameInput() {
 		if (this.hasAdvancedZoneConfig()) return;
-		let e = this.shadowRoot?.querySelector("[data-zone-name-input]");
-		!this.config || !e || (this.updateZoneNameDraft(this.config.selected_zone, e.value), this.dispatchEvent(new CustomEvent("config-changed", {
-			detail: { config: this.config },
-			bubbles: !0,
-			composed: !0
-		})));
+		let e = this.shadowRoot?.querySelector("[data-zone-name-input]"), t = this.activeZoneId();
+		!this.config || !e || !t || await this.setZoneName(t, e.value);
 	}
 	async setZoneName(e, t) {
 		if (!this.config || this.hasAdvancedZoneConfig()) return;
@@ -784,6 +812,23 @@ var B = class extends HTMLElement {
 			entity_id: a,
 			value: r || n(e)
 		}), this.render();
+	}
+	clearSelectedZone() {
+		this.selectedZoneId && (this.hasAdvancedZoneConfig() || this.commitZoneNameInput(), this.selectedZoneId = null, this.render());
+	}
+	async setLd2450ZoneType(e) {
+		if (this.hasAdvancedZoneConfig()) return;
+		let t = this.deviceEntity("zoneType");
+		!t || !this.hassValue?.callService || (await this.hassValue.callService("select", "select_option", {
+			entity_id: t,
+			option: e
+		}), this.render());
+	}
+	attachZoneDialogKeyListener() {
+		this.zoneDialogKeyListenerAttached ||= (window.addEventListener("keydown", this.handleZoneDialogKeyDown), !0);
+	}
+	detachZoneDialogKeyListener() {
+		this.zoneDialogKeyListenerAttached &&= (window.removeEventListener("keydown", this.handleZoneDialogKeyDown), !1);
 	}
 	updateZoneNameDraft(e, t) {
 		if (!this.config) return;
@@ -842,10 +887,7 @@ var B = class extends HTMLElement {
 		let t = e.target, n = t?.dataset.zoneDrag, r = t?.dataset.zoneId;
 		if (!t || !n || !r) return;
 		let i = t.closest("svg"), a = i ? this.pointerToRadarPoint(e, i) : null, o = this.editableZoneRect(r);
-		!i || !a || !o || (e.preventDefault(), e.stopPropagation(), r !== this.config?.selected_zone && (this.config = {
-			...this.config,
-			selected_zone: r
-		}), this.zoneDrag = {
+		!i || !a || !o || (e.preventDefault(), e.stopPropagation(), this.selectedZoneId = r, this.zoneDrag = {
 			zoneId: r,
 			mode: n,
 			corner: t.dataset.zoneCorner,
@@ -920,18 +962,32 @@ var B = class extends HTMLElement {
 			e.preventDefault(), this.closeZoneDialog();
 		}), this.shadowRoot?.querySelector("[data-dialog-backdrop]")?.addEventListener("pointerdown", (e) => {
 			e.target === e.currentTarget && (e.preventDefault(), this.closeZoneDialog());
+		}), this.shadowRoot?.querySelector("[data-dialog-body]")?.addEventListener("pointerdown", (e) => {
+			let t = e.target;
+			t && (t.closest("button,input,[data-zone-drag]") || this.clearSelectedZone());
 		}), this.shadowRoot?.querySelectorAll("[data-zone-select]").forEach((e) => {
 			e.addEventListener("pointerdown", (t) => {
-				t.preventDefault();
+				t.preventDefault(), t.stopPropagation();
 				let n = e.dataset.zoneSelect;
 				n && this.selectZone(n);
 			});
+		}), this.shadowRoot?.querySelectorAll("[data-ld2450-zone-type]").forEach((e) => {
+			e.addEventListener("pointerdown", (t) => {
+				t.preventDefault(), t.stopPropagation();
+				let n = e.dataset.ld2450ZoneType;
+				n && this.setLd2450ZoneType(n);
+			});
 		}), this.shadowRoot?.querySelector("[data-zone-delete]")?.addEventListener("pointerdown", (e) => {
-			e.preventDefault(), this.deleteSelectedZone();
+			e.preventDefault(), e.stopPropagation(), this.deleteSelectedZone();
 		}), this.shadowRoot?.querySelector("[data-zone-name-input]")?.addEventListener("input", (e) => {
-			this.config && this.updateZoneNameDraft(this.config.selected_zone, e.target.value);
+			let t = this.activeZoneId();
+			!this.config || !t || this.updateZoneNameDraft(t, e.target.value);
 		}), this.shadowRoot?.querySelector("[data-zone-name-input]")?.addEventListener("change", (e) => {
-			this.config && this.setZoneName(this.config.selected_zone, e.target.value);
+			let t = this.activeZoneId();
+			!this.config || !t || this.setZoneName(t, e.target.value);
+		}), this.shadowRoot?.querySelector("[data-zone-name-input]")?.addEventListener("blur", (e) => {
+			let t = this.activeZoneId();
+			!this.config || !t || this.setZoneName(t, e.target.value);
 		});
 	}
 	openConfigurator() {
@@ -964,7 +1020,7 @@ var B = class extends HTMLElement {
       ${this.zoneDialogMarkup()}
     `, this.attachEvents();
 	}
-}, V = class extends HTMLElement {
+}, H = class extends HTMLElement {
 	constructor() {
 		super(), this.config = {}, this.hassValue = null, this.modeForm = null, this.deviceForm = null, this.settingsForm = null, this.notice = null, this.modeSchemaCache = null, this.deviceSchemaCache = null, this.settingsSchemaCache = null, this.boundValueChanged = this.valueChanged.bind(this), this.attachShadow({ mode: "open" });
 	}
@@ -976,7 +1032,6 @@ var B = class extends HTMLElement {
 			hold_ms: e.hold_ms,
 			show_distance: e.show_distance,
 			distance_decimals: e.distance_decimals,
-			selected_zone: e.selected_zone,
 			...t
 		}, this.ensureRender(), this.updateNotice(), this.updateForm();
 	}
@@ -1000,26 +1055,6 @@ var B = class extends HTMLElement {
 			{
 				name: "title",
 				selector: { text: {} }
-			},
-			{
-				name: "selected_zone",
-				selector: { select: {
-					mode: "dropdown",
-					options: [
-						{
-							value: "zone_1",
-							label: "Zone 1"
-						},
-						{
-							value: "zone_2",
-							label: "Zone 2"
-						},
-						{
-							value: "zone_3",
-							label: "Zone 3"
-						}
-					]
-				} }
 			},
 			{
 				name: "configurator_url",
@@ -1075,7 +1110,6 @@ var B = class extends HTMLElement {
 			use_yaml_targets: "YAML 타겟 직접 설정 사용",
 			device_id: "레이더 기기",
 			title: "제목",
-			selected_zone: "Zone 선택",
 			configurator_url: "고급 설정 URL",
 			range_x: "X 범위",
 			range_y: "Y 범위",
@@ -1134,7 +1168,7 @@ var B = class extends HTMLElement {
 		return !t || t === "unknown" || t === "unavailable" ? "" : `http://${t}/`;
 	}
 };
-customElements.get("radar-zone-card") || customElements.define("radar-zone-card", B), customElements.get("radar-zone-card-editor") || customElements.define("radar-zone-card-editor", V), window.customCards = window.customCards || [], window.customCards.push({
+customElements.get("radar-zone-card") || customElements.define("radar-zone-card", V), customElements.get("radar-zone-card-editor") || customElements.define("radar-zone-card-editor", H), window.customCards = window.customCards || [], window.customCards.push({
 	type: "radar-zone-card",
 	name: "Radar Zone Card",
 	description: "Realtime radar target map for LD2450-style mmWave sensors"

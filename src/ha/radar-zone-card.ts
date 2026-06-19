@@ -59,12 +59,18 @@ export class RadarZoneCard extends HTMLElement implements RadarZoneCardElement {
   private warnings: string[] = [];
   private resolvedTargets: ResolvedRadarTarget[] = [];
   private zoneDialogOpen = false;
+  private selectedZoneId: RadarZoneId | null = null;
   private readonly zoneDrafts: Partial<Record<RadarZoneId, RadarZoneRect>> = {};
   private zoneDrag: ZoneDragState | null = null;
+  private zoneDialogKeyListenerAttached = false;
 
   constructor() {
     super();
     this.attachShadow({ mode: "open" });
+  }
+
+  disconnectedCallback(): void {
+    this.detachZoneDialogKeyListener();
   }
 
   static getStubConfig(): Partial<RadarCardConfig> {
@@ -161,8 +167,8 @@ export class RadarZoneCard extends HTMLElement implements RadarZoneCardElement {
   }
 
   private selectedZoneRect(): RadarZoneRect | null {
-    if (!this.config) return null;
-    return this.zoneRect(this.config.selected_zone);
+    const zoneId = this.activeZoneId();
+    return zoneId ? this.zoneRect(zoneId) : null;
   }
 
   private isEmptyZoneRect(rect: RadarZoneRect | null): boolean {
@@ -174,7 +180,7 @@ export class RadarZoneCard extends HTMLElement implements RadarZoneCardElement {
     const rect = this.zoneRect(zoneId);
     if (this.hasAdvancedZoneConfig()) return rect;
     if (!this.isEmptyZoneRect(rect)) return rect;
-    if (zoneId !== this.config?.selected_zone || !this.zoneDialogOpen) return null;
+    if (zoneId !== this.activeZoneId() || !this.zoneDialogOpen) return null;
     return this.defaultZoneRect(zoneId);
   }
 
@@ -218,10 +224,19 @@ export class RadarZoneCard extends HTMLElement implements RadarZoneCardElement {
     return entities.name || null;
   }
 
-  private deviceEntity(entityName: "customZoneConfigured" | "zoneSummary" | "zoneConfigJson" | "ipAddress"): string | null {
+  private activeZoneId(): RadarZoneId | null {
+    return this.zoneDialogOpen ? this.selectedZoneId : null;
+  }
+
+  private deviceEntity(entityName: "customZoneConfigured" | "zoneSummary" | "zoneConfigJson" | "ipAddress" | "zoneType"): string | null {
     if (!this.config?.device_id || !this.hassValue) return null;
     const entities = resolveDeviceEntitiesFromDevice(this.config.device_id, this.hassValue);
     return entities[entityName] || null;
+  }
+
+  private ld2450ZoneType(): string {
+    const state = this.entityState(this.deviceEntity("zoneType"));
+    return state === "Filter" || state === "Disabled" ? state : "Detection";
   }
 
   private entityState(entityId: string | null): string {
@@ -338,6 +353,8 @@ export class RadarZoneCard extends HTMLElement implements RadarZoneCardElement {
   private zoneDisplays(): RadarZoneDisplay[] {
     if (!this.config) return [];
     const advancedMode = this.hasAdvancedZoneDataConfig();
+    const activeZoneId = this.activeZoneId();
+    const ld2450ZoneType = this.ld2450ZoneType();
     return (["zone_1", "zone_2", "zone_3"] as RadarZoneId[])
       .map((zoneId): RadarZoneDisplay | null => {
         const rawRect = this.zoneRect(zoneId);
@@ -347,7 +364,8 @@ export class RadarZoneCard extends HTMLElement implements RadarZoneCardElement {
           ...rect,
           label: zoneLabel(zoneId),
           customName: this.zoneCustomName(zoneId),
-          selected: zoneId === this.config?.selected_zone,
+          type: ld2450ZoneType,
+          selected: zoneId === activeZoneId,
           placeholder: !advancedMode && this.isEmptyZoneRect(rawRect)
         };
       })
@@ -556,13 +574,14 @@ export class RadarZoneCard extends HTMLElement implements RadarZoneCardElement {
   private zoneDialogMarkup(): string {
     if (!this.config || !this.zoneDialogOpen) return "";
 
+    const activeZoneId = this.activeZoneId();
     const zoneItems = [
       ["zone_1", "1"],
       ["zone_2", "2"],
       ["zone_3", "3"]
     ]
       .map(([zoneId, label]) => {
-        const active = zoneId === this.config?.selected_zone ? " active" : "";
+        const active = zoneId === activeZoneId ? " active" : "";
         const customName = this.zoneCustomName(zoneId as RadarZoneId);
         return `
           <button class="zone-segment${active}" type="button" data-zone-select="${zoneId}">
@@ -574,9 +593,27 @@ export class RadarZoneCard extends HTMLElement implements RadarZoneCardElement {
       .join("");
     const zoneRect = this.selectedZoneRect();
     const selectedZoneIsEmpty = this.isEmptyZoneRect(zoneRect);
-    const customName = this.zoneCustomName(this.config.selected_zone);
+    const customName = activeZoneId ? this.zoneCustomName(activeZoneId) : "";
     const advancedMode = this.hasAdvancedZoneConfig();
-    const zoneSummary = zoneRect
+    const ld2450ZoneType = this.ld2450ZoneType();
+    const zoneTypeButtons = this.deviceEntity("zoneType")
+      ? (["Detection", "Filter", "Disabled"] as const)
+          .map(
+            (type) => `
+              <button
+                class="zone-type-button ${type.toLowerCase()}${ld2450ZoneType === type ? " selected" : ""}"
+                type="button"
+                data-ld2450-zone-type="${type}"
+              >
+                ${type === "Detection" ? "탐지" : type === "Filter" ? "제외" : "비활성화"}
+              </button>
+            `
+          )
+          .join("")
+      : "";
+    const zoneSummary = !activeZoneId
+      ? "선택된 Zone이 없습니다."
+      : zoneRect
       ? selectedZoneIsEmpty
         ? "아직 설정되지 않았습니다. 지도에 표시된 기본 박스를 끌어서 새 Zone을 만드세요."
         : `X ${zoneRect.x1} ~ ${zoneRect.x2} mm / Y ${zoneRect.y1} ~ ${zoneRect.y2} mm`
@@ -596,29 +633,48 @@ export class RadarZoneCard extends HTMLElement implements RadarZoneCardElement {
           : ""
       }
     `;
+    const selectedControls = activeZoneId
+      ? `
+        <div class="panel-section">
+          <label class="panel-label" for="zone-name-input">커스텀 이름</label>
+          <input
+            id="zone-name-input"
+            class="zone-name-input"
+            data-zone-name-input
+            value="${escapeHtml(customName)}"
+            placeholder="예: 침대, 책상 앞"
+          />
+        </div>
+        <div class="panel-section">
+          <button class="danger-button" type="button" data-zone-delete>선택 Zone 삭제</button>
+          <div class="panel-note">좌표를 0으로 초기화합니다. 다시 만들려면 지도에 표시된 기본 박스를 끌어 저장하세요.</div>
+        </div>
+      `
+      : `
+        <div class="panel-section">
+          <div class="panel-label">Zone 편집</div>
+          <div class="panel-note">왼쪽 목록이나 레이더 지도에서 Zone을 선택하면 이름과 좌표를 편집할 수 있습니다.</div>
+        </div>
+      `;
     const basicPanel = `
+      <div class="panel-section">
+        <div class="panel-label">전체 Zone 동작</div>
+        ${
+          zoneTypeButtons
+            ? `<div class="zone-type-buttons">${zoneTypeButtons}</div>
+               <div class="panel-note">LD2450 기본 컴포넌트의 Zone Type입니다. 선택한 모드는 Zone 1/2/3 전체에 일괄 적용됩니다.</div>`
+            : `<div class="panel-note">이 기기에서 LD2450 Zone Type 엔티티를 찾지 못했습니다.</div>`
+        }
+      </div>
       <div class="panel-section">
         <div class="panel-label">Zone 좌표</div>
         <div class="panel-note">${escapeHtml(zoneSummary)}</div>
       </div>
       <div class="panel-section">
-        <label class="panel-label" for="zone-name-input">커스텀 이름</label>
-        <input
-          id="zone-name-input"
-          class="zone-name-input"
-          data-zone-name-input
-          value="${escapeHtml(customName)}"
-          placeholder="예: 침대, 책상 앞"
-        />
-      </div>
-      <div class="panel-section">
         <div class="panel-label">Zone 선택</div>
         <div class="zone-segments">${zoneItems}</div>
       </div>
-      <div class="panel-section">
-        <button class="danger-button" type="button" data-zone-delete>선택 Zone 삭제</button>
-        <div class="panel-note">좌표를 0으로 초기화합니다. 다시 만들려면 지도에 표시된 기본 박스를 끌어 저장하세요.</div>
-      </div>
+      ${selectedControls}
     `;
 
     return `
@@ -631,7 +687,7 @@ export class RadarZoneCard extends HTMLElement implements RadarZoneCardElement {
             </div>
             <button class="dialog-close" type="button" data-dialog-close aria-label="닫기">×</button>
           </div>
-          <div class="dialog-body">
+          <div class="dialog-body" data-dialog-body>
             <div class="dialog-map" data-radar-dialog-map>
               ${this.radarSvgMarkup(720, 520, 32, !advancedMode)}
             </div>
@@ -645,42 +701,36 @@ export class RadarZoneCard extends HTMLElement implements RadarZoneCardElement {
   }
 
   private openZoneDialog(): void {
+    this.selectedZoneId = null;
     this.zoneDialogOpen = true;
+    this.attachZoneDialogKeyListener();
     this.render();
   }
 
   private closeZoneDialog(): void {
     if (!this.hasAdvancedZoneConfig()) {
-      this.commitZoneNameInput();
+      void this.commitZoneNameInput();
     }
     this.zoneDialogOpen = false;
+    this.selectedZoneId = null;
+    this.detachZoneDialogKeyListener();
     this.render();
   }
 
   private selectZone(zoneId: RadarZoneId): void {
     if (!this.config) return;
     if (!this.hasAdvancedZoneConfig()) {
-      this.commitZoneNameInput();
+      void this.commitZoneNameInput();
     }
-    this.config = {
-      ...this.config,
-      selected_zone: zoneId
-    };
-    this.dispatchEvent(
-      new CustomEvent("config-changed", {
-        detail: { config: this.config },
-        bubbles: true,
-        composed: true
-      })
-    );
+    this.selectedZoneId = zoneId;
     this.render();
   }
 
   private async deleteSelectedZone(): Promise<void> {
     if (!this.config) return;
     if (this.hasAdvancedZoneConfig()) return;
-    this.commitZoneNameInput();
-    const zoneId = this.config.selected_zone;
+    const zoneId = this.activeZoneId();
+    if (!zoneId) return;
     this.zoneDrafts[zoneId] = {
       zoneId,
       x1: 0,
@@ -689,21 +739,16 @@ export class RadarZoneCard extends HTMLElement implements RadarZoneCardElement {
       y2: 0
     };
     await this.commitZoneRect(zoneId);
+    await this.setZoneName(zoneId, "");
     this.render();
   }
 
-  private commitZoneNameInput(): void {
+  private async commitZoneNameInput(): Promise<void> {
     if (this.hasAdvancedZoneConfig()) return;
     const input = this.shadowRoot?.querySelector("[data-zone-name-input]") as HTMLInputElement | null;
-    if (!this.config || !input) return;
-    this.updateZoneNameDraft(this.config.selected_zone, input.value);
-    this.dispatchEvent(
-      new CustomEvent("config-changed", {
-        detail: { config: this.config },
-        bubbles: true,
-        composed: true
-      })
-    );
+    const zoneId = this.activeZoneId();
+    if (!this.config || !input || !zoneId) return;
+    await this.setZoneName(zoneId, input.value);
   }
 
   private async setZoneName(zoneId: RadarZoneId, name: string): Promise<void> {
@@ -738,6 +783,51 @@ export class RadarZoneCard extends HTMLElement implements RadarZoneCardElement {
     }
     this.render();
   }
+
+  private clearSelectedZone(): void {
+    if (!this.selectedZoneId) return;
+    if (!this.hasAdvancedZoneConfig()) {
+      void this.commitZoneNameInput();
+    }
+    this.selectedZoneId = null;
+    this.render();
+  }
+
+  private async setLd2450ZoneType(type: "Detection" | "Filter" | "Disabled"): Promise<void> {
+    if (this.hasAdvancedZoneConfig()) return;
+    const entityId = this.deviceEntity("zoneType");
+    if (!entityId || !this.hassValue?.callService) return;
+    await this.hassValue.callService("select", "select_option", {
+      entity_id: entityId,
+      option: type
+    });
+    this.render();
+  }
+
+  private attachZoneDialogKeyListener(): void {
+    if (this.zoneDialogKeyListenerAttached) return;
+    window.addEventListener("keydown", this.handleZoneDialogKeyDown);
+    this.zoneDialogKeyListenerAttached = true;
+  }
+
+  private detachZoneDialogKeyListener(): void {
+    if (!this.zoneDialogKeyListenerAttached) return;
+    window.removeEventListener("keydown", this.handleZoneDialogKeyDown);
+    this.zoneDialogKeyListenerAttached = false;
+  }
+
+  private readonly handleZoneDialogKeyDown = (event: KeyboardEvent): void => {
+    if (!this.zoneDialogOpen || this.hasAdvancedZoneConfig() || !this.selectedZoneId) return;
+    const path = event.composedPath();
+    const isEditingText = path.some((node) => {
+      if (!(node instanceof HTMLElement)) return false;
+      return Boolean(node.closest("input,textarea,select") || node.isContentEditable);
+    });
+    if (isEditingText) return;
+    if (event.key !== "Delete" && event.key !== "Backspace") return;
+    event.preventDefault();
+    void this.deleteSelectedZone();
+  };
 
   private updateZoneNameDraft(zoneId: RadarZoneId, name: string): void {
     if (!this.config) return;
@@ -826,12 +916,7 @@ export class RadarZoneCard extends HTMLElement implements RadarZoneCardElement {
     event.preventDefault();
     event.stopPropagation();
 
-    if (zoneId !== this.config?.selected_zone) {
-      this.config = {
-        ...this.config!,
-        selected_zone: zoneId
-      };
-    }
+    this.selectedZoneId = zoneId;
 
     this.zoneDrag = {
       zoneId,
@@ -989,12 +1074,31 @@ export class RadarZoneCard extends HTMLElement implements RadarZoneCardElement {
           this.closeZoneDialog();
         }
       });
+    this.shadowRoot
+      ?.querySelector("[data-dialog-body]")
+      ?.addEventListener("pointerdown", (event) => {
+        const target = event.target as HTMLElement | null;
+        if (!target) return;
+        if (target.closest("button,input,[data-zone-drag]")) return;
+        this.clearSelectedZone();
+      });
     this.shadowRoot?.querySelectorAll("[data-zone-select]").forEach((button) => {
       button.addEventListener("pointerdown", (event) => {
         event.preventDefault();
+        event.stopPropagation();
         const zoneId = (button as HTMLElement).dataset.zoneSelect as RadarZoneId | undefined;
         if (zoneId) {
           this.selectZone(zoneId);
+        }
+      });
+    });
+    this.shadowRoot?.querySelectorAll("[data-ld2450-zone-type]").forEach((button) => {
+      button.addEventListener("pointerdown", (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        const type = (button as HTMLElement).dataset.ld2450ZoneType as "Detection" | "Filter" | "Disabled" | undefined;
+        if (type) {
+          void this.setLd2450ZoneType(type);
         }
       });
     });
@@ -1002,19 +1106,29 @@ export class RadarZoneCard extends HTMLElement implements RadarZoneCardElement {
       ?.querySelector("[data-zone-delete]")
       ?.addEventListener("pointerdown", (event) => {
         event.preventDefault();
+        event.stopPropagation();
         void this.deleteSelectedZone();
       });
     this.shadowRoot
       ?.querySelector("[data-zone-name-input]")
       ?.addEventListener("input", (event) => {
-        if (!this.config) return;
-        this.updateZoneNameDraft(this.config.selected_zone, (event.target as HTMLInputElement).value);
+        const zoneId = this.activeZoneId();
+        if (!this.config || !zoneId) return;
+        this.updateZoneNameDraft(zoneId, (event.target as HTMLInputElement).value);
       });
     this.shadowRoot
       ?.querySelector("[data-zone-name-input]")
       ?.addEventListener("change", (event) => {
-        if (!this.config) return;
-        void this.setZoneName(this.config.selected_zone, (event.target as HTMLInputElement).value);
+        const zoneId = this.activeZoneId();
+        if (!this.config || !zoneId) return;
+        void this.setZoneName(zoneId, (event.target as HTMLInputElement).value);
+      });
+    this.shadowRoot
+      ?.querySelector("[data-zone-name-input]")
+      ?.addEventListener("blur", (event) => {
+        const zoneId = this.activeZoneId();
+        if (!this.config || !zoneId) return;
+        void this.setZoneName(zoneId, (event.target as HTMLInputElement).value);
       });
   }
 

@@ -43,6 +43,7 @@ export interface RadarZoneRect {
 export interface RadarZoneDisplay extends RadarZoneRect {
   label: string;
   customName?: string;
+  type?: string;
   selected: boolean;
   placeholder?: boolean;
 }
@@ -59,7 +60,6 @@ export interface RadarCardConfig {
   device_id: string;
   configurator_url?: string;
   use_yaml_targets?: boolean;
-  selected_zone: RadarZoneId;
   zone_names: Partial<Record<RadarZoneId, string>>;
 }
 

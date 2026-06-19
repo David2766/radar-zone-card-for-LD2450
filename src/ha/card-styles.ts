@@ -135,6 +135,19 @@ export const CARD_STYLES = `
     stroke-width: 1.5;
     stroke-dasharray: 8 5;
   }
+  .zone-rect.detection rect {
+    fill: rgba(255, 209, 102, 0.09);
+    stroke: rgba(255, 209, 102, 0.68);
+  }
+  .zone-rect.filter rect {
+    fill: rgba(255, 107, 122, 0.1);
+    stroke: rgba(255, 107, 122, 0.74);
+  }
+  .zone-rect.disabled rect {
+    fill: rgba(160, 174, 184, 0.06);
+    stroke: rgba(160, 174, 184, 0.52);
+    stroke-dasharray: 3 5;
+  }
   .dialog-map .zone-rect rect {
     cursor: move;
     pointer-events: all;
@@ -144,8 +157,16 @@ export const CARD_STYLES = `
     stroke: rgba(255, 209, 102, 0.95);
     stroke-width: 2.2;
   }
+  .zone-rect.selected.filter rect {
+    fill: rgba(255, 107, 122, 0.18);
+    stroke: rgba(255, 107, 122, 0.98);
+  }
+  .zone-rect.selected.disabled rect {
+    fill: rgba(160, 174, 184, 0.14);
+    stroke: rgba(215, 238, 252, 0.72);
+  }
   .zone-rect.placeholder rect {
-    fill: rgba(255, 209, 102, 0.08);
+    fill: rgba(215, 238, 252, 0.05);
     stroke-dasharray: 4 4;
   }
   .zone-rect.advanced polygon {
@@ -348,6 +369,41 @@ export const CARD_STYLES = `
   .zone-name-input:focus {
     border-color: rgba(255, 209, 102, 0.75);
     outline: none;
+  }
+  .zone-type-buttons {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 6px;
+    margin-bottom: 8px;
+  }
+  .zone-type-button {
+    min-width: 0;
+    padding: 7px 4px;
+    border: 1px solid rgba(123, 184, 216, 0.24);
+    border-radius: 6px;
+    background: rgba(123, 184, 216, 0.08);
+    color: #d7eefc;
+    cursor: pointer;
+    font: inherit;
+    font-size: 12px;
+  }
+  .zone-type-button:hover {
+    background: rgba(123, 184, 216, 0.18);
+  }
+  .zone-type-button.detection.selected {
+    border-color: rgba(255, 209, 102, 0.72);
+    background: rgba(255, 209, 102, 0.16);
+    color: #fff3c4;
+  }
+  .zone-type-button.filter.selected {
+    border-color: rgba(255, 107, 122, 0.72);
+    background: rgba(255, 107, 122, 0.16);
+    color: #ffd7dd;
+  }
+  .zone-type-button.disabled.selected {
+    border-color: rgba(160, 174, 184, 0.6);
+    background: rgba(160, 174, 184, 0.12);
+    color: rgba(215, 238, 252, 0.72);
   }
   .zone-segment:hover {
     background: rgba(123, 184, 216, 0.18);

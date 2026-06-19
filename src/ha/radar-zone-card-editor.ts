@@ -30,7 +30,6 @@ export class RadarZoneCardEditor extends HTMLElement {
       hold_ms: DEFAULT_CARD_CONFIG.hold_ms,
       show_distance: DEFAULT_CARD_CONFIG.show_distance,
       distance_decimals: DEFAULT_CARD_CONFIG.distance_decimals,
-      selected_zone: DEFAULT_CARD_CONFIG.selected_zone,
       ...config
     };
     this.ensureRender();
@@ -57,19 +56,6 @@ export class RadarZoneCardEditor extends HTMLElement {
   private settingsSchema(): SchemaItem[] {
     this.settingsSchemaCache ||= [
       { name: "title", selector: { text: {} } },
-      {
-        name: "selected_zone",
-        selector: {
-          select: {
-            mode: "dropdown",
-            options: [
-              { value: "zone_1", label: "Zone 1" },
-              { value: "zone_2", label: "Zone 2" },
-              { value: "zone_3", label: "Zone 3" }
-            ]
-          }
-        }
-      },
       { name: "configurator_url", selector: { text: {} } },
       {
         type: "grid",
@@ -99,7 +85,6 @@ export class RadarZoneCardEditor extends HTMLElement {
       use_yaml_targets: "YAML 타겟 직접 설정 사용",
       device_id: "레이더 기기",
       title: "제목",
-      selected_zone: "Zone 선택",
       configurator_url: "고급 설정 URL",
       range_x: "X 범위",
       range_y: "Y 범위",

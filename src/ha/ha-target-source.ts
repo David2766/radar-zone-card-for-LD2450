@@ -21,6 +21,7 @@ export interface RadarDeviceEntitySet {
   customZoneConfigured?: string;
   zoneSummary?: string;
   zoneConfigJson?: string;
+  zoneType?: string;
   softwareZoneConfigs: string[];
   calibrationZoneConfigs: string[];
 }
@@ -95,6 +96,7 @@ export function resolveDeviceEntitiesFromDevice(
     customZoneConfigured: findCustomZoneConfiguredEntity(entities) || undefined,
     zoneSummary: findZoneSummaryEntity(entities) || undefined,
     zoneConfigJson: findZoneConfigJsonEntity(entities) || undefined,
+    zoneType: findLd2450ZoneTypeEntity(entities) || undefined,
     softwareZoneConfigs: findSoftwareZoneConfigEntities(entities),
     calibrationZoneConfigs: findCalibrationZoneConfigEntities(entities)
   };
@@ -182,6 +184,16 @@ export function findZoneConfigJsonEntity(entities: RegistryEntity[]): string | n
     "zoneconfigjson",
     "zonejson",
     "advancedzoneconfig"
+  ].map((pattern) => normalize(pattern));
+
+  return findBestEntityMatch(entities, patterns);
+}
+
+export function findLd2450ZoneTypeEntity(entities: RegistryEntity[]): string | null {
+  const patterns = [
+    "ld2450zonetype",
+    "zonetype",
+    "zone type"
   ].map((pattern) => normalize(pattern));
 
   return findBestEntityMatch(entities, patterns);
