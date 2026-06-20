@@ -29,6 +29,9 @@ Preview 버전입니다.
 
 ## 설치 방법
 
+### 0. 커스텀 카드 파일 다운로드
+[Release 에서 다운로드하기](https://github.com/David2766/radar-zone-card-for-LD2450/releases/tag/v0.1.0-alpha)
+
 ### 1. 카드 파일 복사
 
 빌드된 파일을 Home Assistant의 `www` 폴더에 복사합니다.
