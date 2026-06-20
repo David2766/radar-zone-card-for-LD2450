@@ -7,8 +7,6 @@
   "scripts": {
     "build": "npm run build:ha",
     "build:ha": "vite build --mode ha",
-    "build:web": "vite build --mode web",
-    "dev:web": "vite --mode web",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "format": "prettier --write \"src/**/*.{ts,css}\" \"*.{json,ts}\""
@@ -20,7 +18,7 @@
     "radar"
   ],
   "author": "",
-  "license": "MIT",
+  "license": "AGPL-3.0-or-later",
   "devDependencies": {
     "eslint": "^10.5.0",
     "prettier": "^3.8.4",
