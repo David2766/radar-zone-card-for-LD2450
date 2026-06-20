@@ -60,13 +60,13 @@ type: module
 type: custom:radar-zone-card
 title: Radar Map
 ```
-![Visual Editor](docs/images/4.png)
 비주얼 에디터에서 기기를 선택하면 지원되는 엔티티를 자동으로 찾도록 설계되어 있습니다.
+![Visual Editor](docs/images/4.png)
 
 ## 수동 설정 예시
 
-![YAML Editor](docs/images/5.png)
 자동 인식이 되지 않는 경우, 타겟 X/Y 엔티티를 직접 지정할 수 있습니다.
+![YAML Editor](docs/images/5.png)
 
 ```yaml
 type: custom:radar-zone-card
