@@ -130,12 +130,6 @@ Home Assistant 카드 빌드:
 npm run build:ha
 ```
 
-웹앱 빌드:
-
-```bash
-npm run build:web
-```
-
 타입 체크:
 
 ```bash
