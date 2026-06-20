@@ -5,24 +5,27 @@ LD2450 mmWave 레이더 센서의 타겟 위치와 Zone 설정을 Home Assistant
 현재 이 프로젝트는 ESPHome 기반 LD2450 재실 감지 센서와 함께 사용하는 것을 기준으로 개발 중입니다.
 
 ## 주요 기능
+![Radar Zone Card](docs/images/2.png)
+![Radar Zone Card](docs/images/1.png)
 
+기본적으로 지원되는 기능은 아래와 같습니다.
 - LD2450 타겟 위치 실시간 표시
 - 타겟별 거리 표시
 - 사각형 Zone 표시
-- 다각형 Software Zone 표시
 - Detection / Filter / Disabled Zone 타입 표시
+- Home Assistant 비주얼 에디터 지원
+
+특정 펌웨어와만 호환되는 기능은 아래와 같습니다.
+- 다각형 Software Zone 표시
 - 오탐 보정 Zone 표시
 - Software Zone JSON 연동
-- Home Assistant 비주얼 에디터 지원
-- 고급 Zone 설정 웹앱으로 이동하는 버튼 지원
+- 고급 Zone 설정 웹앱으로 이동하는 버튼
 
 ## 현재 상태
 
 Preview 버전입니다.
 
 기본적인 레이더맵 표시와 Zone 시각화는 동작하지만, 모든 LD2450 DIY 구성에서 바로 동작하도록 범용화된 상태는 아닙니다.
-
-특히 Software Zone JSON, 오탐 보정 Zone, 고급 Zone 설정 웹앱 연동 기능은 특정 ESPHome 펌웨어 구성을 기준으로 동작합니다.
 
 ## 설치 방법
 
@@ -57,11 +60,12 @@ type: module
 type: custom:radar-zone-card
 title: Radar Map
 ```
-
+![Visual Editor](docs/images/4.png)
 비주얼 에디터에서 기기를 선택하면 지원되는 엔티티를 자동으로 찾도록 설계되어 있습니다.
 
 ## 수동 설정 예시
 
+![YAML Editor](docs/images/5.png)
 자동 인식이 되지 않는 경우, 타겟 X/Y 엔티티를 직접 지정할 수 있습니다.
 
 ```yaml
