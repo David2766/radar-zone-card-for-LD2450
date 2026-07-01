@@ -1,9 +1,9 @@
 {
-  "name": "radar-zone-card",
+  "name": "radar-zone-card-for-ld2450",
   "version": "0.1.0",
-  "description": "Realtime LD2450-style radar map card for Home Assistant",
+  "description": "LD2450 radar zone card for Home Assistant",
   "type": "module",
-  "private": true,
+  "private": false,
   "scripts": {
     "build": "npm run build:ha",
     "build:ha": "vite build --mode ha",
@@ -20,8 +20,11 @@
   "author": "",
   "license": "AGPL-3.0-or-later",
   "devDependencies": {
+    "@sveltejs/vite-plugin-svelte": "^7.1.2",
     "eslint": "^10.5.0",
+    "playwright": "^1.61.0",
     "prettier": "^3.8.4",
+    "svelte": "^5.56.3",
     "typescript": "^6.0.3",
     "vite": "^8.0.16",
     "vitest": "^4.1.9"

@@ -1,11 +1,14 @@
 import type { RadarScreenPoint, RadarViewport } from "./types";
+import { LD2450_FOV_DEGREES } from "./constants";
 
-export const LD2450_MAX_DISTANCE_MM = 6000;
-export const LD2450_FOV_DEGREES = 120;
-export const LD2450_ZONE_MIN_X_MM = -4860;
-export const LD2450_ZONE_MAX_X_MM = 4860;
-export const LD2450_ZONE_MIN_Y_MM = 0;
-export const LD2450_ZONE_MAX_Y_MM = 7560;
+export {
+  LD2450_FOV_DEGREES,
+  LD2450_MAX_DISTANCE_MM,
+  LD2450_ZONE_MAX_X_MM,
+  LD2450_ZONE_MAX_Y_MM,
+  LD2450_ZONE_MIN_X_MM,
+  LD2450_ZONE_MIN_Y_MM
+} from "./constants";
 
 export function toScreenPoint(x: number, y: number, viewport: RadarViewport): RadarScreenPoint {
   const usableWidth = viewport.width - viewport.pad * 2;

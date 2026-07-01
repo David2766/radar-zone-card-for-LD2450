@@ -1,4 +1,5 @@
 import { DEFAULT_CARD_CONFIG, zoneLabel } from "../core/defaults";
+import { advancedZonesFromConfigTexts, advancedZonesFromDeviceConfigJson } from "../core/config-codec";
 import { escapeHtml } from "../core/html";
 import { LD2450_FOV_DEGREES, radarViewportRangeX, toRadarPoint, toScreenPoint } from "../core/radar-math";
 import { renderGrid, renderTargets, renderZoneRects } from "../core/radar-svg";
@@ -12,6 +13,7 @@ import type {
   RadarZoneRect,
   ResolvedRadarTarget
 } from "../core/types";
+import type { AdvancedZoneDisplayModel } from "../core/zones";
 import { CARD_STYLES } from "./card-styles";
 import type { HomeAssistantLike, RadarZoneCardElement } from "./ha-types";
 import {
@@ -24,13 +26,7 @@ import {
 type ZoneDragMode = "move" | "resize";
 type ZoneCorner = "x1y1" | "x1y2" | "x2y1" | "x2y2";
 
-interface AdvancedZoneDisplay {
-  id: string;
-  name: string;
-  type: string;
-  points: Array<[number, number]>;
-  calibration: boolean;
-}
+type AdvancedZoneDisplay = AdvancedZoneDisplayModel;
 
 interface ZoneDragState {
   zoneId: RadarZoneId;
@@ -63,6 +59,10 @@ export class RadarZoneCard extends HTMLElement implements RadarZoneCardElement {
   private readonly zoneDrafts: Partial<Record<RadarZoneId, RadarZoneRect>> = {};
   private zoneDrag: ZoneDragState | null = null;
   private zoneDialogKeyListenerAttached = false;
+  private apiConfigUrl = "";
+  private apiConfigLoadingUrl = "";
+  private apiConfigLoadedAt = 0;
+  private apiAdvancedZones: AdvancedZoneDisplay[] = [];
 
   constructor() {
     super();
@@ -110,12 +110,14 @@ export class RadarZoneCard extends HTMLElement implements RadarZoneCardElement {
       targets: config.targets || DEFAULT_CARD_CONFIG.targets
     };
     this.errors = [...errors, ...this.validateConfig(this.config)];
+    this.updateDeviceConfigZones();
     this.render();
   }
 
   set hass(hass: HomeAssistantLike) {
     this.hassValue = hass;
     this.updateTargets();
+    this.updateDeviceConfigZones();
     if (this.zoneDrag) {
       this.updateRadarOnly();
       return;
@@ -244,6 +246,56 @@ export class RadarZoneCard extends HTMLElement implements RadarZoneCardElement {
     return this.hassValue?.states[entityId]?.state?.trim() || "";
   }
 
+  private deviceConfigApiUrl(): string {
+    const ipAddress = this.entityState(this.deviceEntity("ipAddress"));
+    if (!ipAddress || ipAddress === "unknown" || ipAddress === "unavailable") return "";
+    try {
+      const url = new URL(/^https?:\/\//i.test(ipAddress) ? ipAddress : `http://${ipAddress}`);
+      url.pathname = "/api/config";
+      url.search = "";
+      url.hash = "";
+      return url.toString();
+    } catch {
+      return "";
+    }
+  }
+
+  private updateDeviceConfigZones(): void {
+    const url = this.deviceConfigApiUrl();
+    if (!url) {
+      this.apiConfigUrl = "";
+      this.apiConfigLoadingUrl = "";
+      this.apiConfigLoadedAt = 0;
+      this.apiAdvancedZones = [];
+      return;
+    }
+    if (url === this.apiConfigLoadingUrl) return;
+    if (url === this.apiConfigUrl && Date.now() - this.apiConfigLoadedAt < 30000) return;
+
+    this.apiConfigLoadingUrl = url;
+    void fetch(url, { cache: "no-store" })
+      .then((response) => (response.ok ? response.text() : Promise.reject(new Error(`HTTP ${response.status}`))))
+      .then((rawConfig) => {
+        if (this.apiConfigLoadingUrl !== url) return;
+        this.apiConfigUrl = url;
+        this.apiConfigLoadingUrl = "";
+        this.apiConfigLoadedAt = Date.now();
+        this.apiAdvancedZones = advancedZonesFromDeviceConfigJson(rawConfig);
+        if (this.zoneDrag || this.isEditingZoneName()) {
+          this.updateRadarOnly();
+        } else {
+          this.render();
+        }
+      })
+      .catch(() => {
+        if (this.apiConfigLoadingUrl !== url) return;
+        this.apiConfigUrl = url;
+        this.apiConfigLoadingUrl = "";
+        this.apiConfigLoadedAt = Date.now();
+        this.apiAdvancedZones = [];
+      });
+  }
+
   private hasCustomZoneConfiguredFlag(): boolean {
     const configured = this.entityState(this.deviceEntity("customZoneConfigured")).toLowerCase();
     return ["on", "true", "yes", "1"].includes(configured);
@@ -265,87 +317,17 @@ export class RadarZoneCard extends HTMLElement implements RadarZoneCardElement {
       .filter((value) => value && value !== "unknown" && value !== "unavailable" && value !== "__EMPTY__");
   }
 
-  private advancedZoneFromConfig(rawJson: string): AdvancedZoneDisplay | null {
-    try {
-      const zone = JSON.parse(rawJson) as {
-        id?: unknown;
-        name?: unknown;
-        type?: unknown;
-        points?: unknown;
-      };
-      return this.normalizeAdvancedZone(zone);
-    } catch {
-      return null;
-    }
-  }
-
-  private normalizeAdvancedZone(zone: {
-    id?: unknown;
-    name?: unknown;
-    type?: unknown;
-    points?: unknown;
-  }): AdvancedZoneDisplay | null {
-    if (typeof zone.id !== "string") return null;
-    if (!Array.isArray(zone.points)) return null;
-    const points = zone.points
-      .map((point): [number, number] | null => {
-        if (!Array.isArray(point) || point.length < 2) return null;
-        const x = Number(point[0]);
-        const y = Number(point[1]);
-        return Number.isFinite(x) && Number.isFinite(y) ? [x, y] : null;
-      })
-      .filter((point): point is [number, number] => point !== null)
-      .slice(0, 8);
-    if (points.length < 3) return null;
-    return {
-      id: zone.id,
-      name: typeof zone.name === "string" ? zone.name : "",
-      type: typeof zone.type === "string" ? zone.type : "detection",
-      points,
-      calibration: zone.id.startsWith("calibration_")
-    };
-  }
-
-  private advancedZonesFromFullJson(): AdvancedZoneDisplay[] {
-    const rawJson = this.entityState(this.deviceEntity("zoneConfigJson"));
-    if (!rawJson || rawJson === "unknown" || rawJson === "unavailable" || rawJson === "{}") {
-      return [];
-    }
-
-    try {
-      const parsed = JSON.parse(rawJson) as {
-        advanced?: boolean;
-        zones?: Array<{
-          id?: unknown;
-          name?: unknown;
-          type?: unknown;
-          points?: unknown;
-        }>;
-        calibrationZones?: Array<{
-          id?: unknown;
-          name?: unknown;
-          type?: unknown;
-          points?: unknown;
-        }>;
-      };
-      if (!parsed.advanced) return [];
-      return [...(Array.isArray(parsed.zones) ? parsed.zones : []), ...(Array.isArray(parsed.calibrationZones) ? parsed.calibrationZones : [])]
-        .map((zone) => this.normalizeAdvancedZone(zone))
-        .filter((zone): zone is AdvancedZoneDisplay => zone !== null);
-    } catch {
-      return [];
-    }
-  }
-
   private advancedZones(): AdvancedZoneDisplay[] {
-    const zones = this.softwareZoneConfigStates()
-      .map((value) => this.advancedZoneFromConfig(value))
-      .filter((zone): zone is AdvancedZoneDisplay => zone !== null);
-
-    return zones.length > 0 ? zones : this.advancedZonesFromFullJson();
+    if (this.apiAdvancedZones.length > 0) return this.apiAdvancedZones;
+    return advancedZonesFromConfigTexts(this.softwareZoneConfigStates(), this.entityState(this.deviceEntity("zoneConfigJson")));
   }
 
   private deviceZoneSummary(): string {
+    if (this.apiAdvancedZones.length > 0) {
+      const zones = this.apiAdvancedZones.filter((zone) => !zone.calibration).length;
+      const calibrationZones = this.apiAdvancedZones.filter((zone) => zone.calibration).length;
+      return `탐지 구역 ${zones}개 / 오탐 보정 ${calibrationZones}개`;
+    }
     const summary = this.entityState(this.deviceEntity("zoneSummary"));
     return summary && summary !== "unknown" && summary !== "unavailable" ? summary : "고급 Zone 설정 정보가 없습니다.";
   }
@@ -1140,13 +1122,26 @@ export class RadarZoneCard extends HTMLElement implements RadarZoneCardElement {
 
   private configuratorUrl(): string {
     const explicitUrl = this.config?.configurator_url?.trim();
-    if (explicitUrl) return explicitUrl;
+    if (explicitUrl) return this.dashboardUrl(explicitUrl);
     if (!this.config?.device_id || !this.hassValue) return "";
 
     const entities = resolveDeviceEntitiesFromDevice(this.config.device_id, this.hassValue);
     const ipAddress = entities.ipAddress ? this.hassValue.states[entities.ipAddress]?.state?.trim() : "";
     if (!ipAddress || ipAddress === "unknown" || ipAddress === "unavailable") return "";
-    return `http://${ipAddress}/`;
+    return this.dashboardUrl(`http://${ipAddress}`);
+  }
+
+  private dashboardUrl(baseUrl: string): string {
+    const trimmed = baseUrl.trim();
+    if (!trimmed) return "";
+    const urlText = /^https?:\/\//i.test(trimmed) ? trimmed : `http://${trimmed}`;
+    try {
+      const url = new URL(urlText);
+      if (!url.pathname || url.pathname === "/") url.pathname = "/dashboard";
+      return url.toString();
+    } catch {
+      return `${trimmed.replace(/\/+$/, "")}/dashboard`;
+    }
   }
 
   private render(): void {

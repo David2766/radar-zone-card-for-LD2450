@@ -76,3 +76,110 @@ export interface RadarViewport {
   rangeY: number;
   fovDegrees: number;
 }
+
+export type WebZoneType = "detection" | "filter" | "reduced" | "disabled";
+
+export interface WebTarget {
+  id: string;
+  name: string;
+  color: string;
+  x: number;
+  y: number;
+  active: boolean;
+  rawX?: number;
+  rawY?: number;
+  rawActive?: boolean;
+  filtered?: boolean;
+  reduced?: boolean;
+  filterReason?: string;
+}
+
+export interface WebZone {
+  id: string;
+  name: string;
+  type: WebZoneType;
+  shape: "rect" | "polygon";
+  points: Array<[number, number]>;
+  placeholder?: boolean;
+  minSizeUnlocked?: boolean;
+  minPoints?: Array<[number, number]>;
+}
+
+export interface WebDeviceState {
+  connected: boolean;
+  targets: WebTarget[];
+  updatedAt: number;
+  pirMotion?: boolean;
+  pirMotionEffective?: boolean;
+  filterBlocked?: boolean;
+  presence?: boolean;
+  motion?: boolean;
+  targetCount?: number;
+  movingTargetCount?: number;
+  stillTargetCount?: number;
+  temperatureC?: number | null;
+  humidityPercent?: number | null;
+  illuminanceLux?: number | null;
+}
+
+export interface WebDeviceConfig {
+  version: number;
+  zones: WebZone[];
+  calibrationZones?: WebZone[];
+  floorplan?: {
+    enabled: boolean;
+    hasImage: boolean;
+    scaleMmPerPx?: number;
+    radarOcclusionIgnoredEdges?: string[];
+    radar?: {
+      originX: number;
+      originY: number;
+      rotation: number;
+      scale: number;
+    };
+  };
+}
+
+export interface WebStatsEntry {
+  d?: number;
+  s?: number;
+  e?: number;
+  f: number;
+  r: number;
+  fz: number[];
+  rz: number[];
+  sz: number[];
+}
+
+export interface WebStatsHeatmap {
+  version: number;
+  cols: number;
+  rows: number;
+  cellMm: number;
+  encoding: "rle";
+  today: string;
+  daily?: Array<string | { d?: number; data?: string }>;
+}
+
+export interface WebStatsSummaryEntry {
+  days: number;
+  f: number;
+  r: number;
+  fz: number[];
+  rz: number[];
+  sz: number[];
+}
+
+export interface WebStatsSummary {
+  last3Days?: WebStatsSummaryEntry;
+  last7Days?: WebStatsSummaryEntry;
+  last15Days?: WebStatsSummaryEntry;
+  last30Days?: WebStatsSummaryEntry;
+}
+
+export interface WebDeviceStats {
+  today: WebStatsEntry | null;
+  daily: Array<WebStatsEntry | null>;
+  summary?: WebStatsSummary;
+  heatmap?: WebStatsHeatmap;
+}

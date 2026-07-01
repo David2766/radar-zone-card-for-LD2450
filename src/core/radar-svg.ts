@@ -1,6 +1,9 @@
 import { distanceLabel, isPointInRadarCoverage, pointAtPolar, toScreenPoint } from "./radar-math";
 import { escapeHtml } from "./html";
+import { targetColor } from "./defaults";
 import type { HeldRadarTarget, RadarCardConfig, RadarViewport, RadarZoneDisplay } from "./types";
+
+const SAFE_CSS_HEX_COLOR = /^#(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{4}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})$/;
 
 export function renderGrid(viewport: RadarViewport): string {
   const centerX = viewport.width / 2;
@@ -53,9 +56,10 @@ export function renderTargets(
         config.distance_decimals
       );
       const label = escapeHtml(target.name);
+      const color = safeTargetColor(target.color);
 
       return `
-        <g class="target${inCoverage ? "" : " out-of-coverage"}" style="--target-color:${target.color}; opacity:${opacity}">
+        <g class="target${inCoverage ? "" : " out-of-coverage"}" style="--target-color:${color}; opacity:${opacity}">
           <circle cx="${point.x}" cy="${point.y}" r="9"></circle>
           <text x="${point.x}" y="${point.y - 18}">
             <tspan x="${point.x}" dy="0">${label}</tspan>
@@ -65,6 +69,11 @@ export function renderTargets(
       `;
     })
     .join("");
+}
+
+export function safeTargetColor(value: string): string {
+  const color = value.trim();
+  return SAFE_CSS_HEX_COLOR.test(color) ? color : targetColor(0);
 }
 
 function distanceTicks(rangeY: number): number[] {

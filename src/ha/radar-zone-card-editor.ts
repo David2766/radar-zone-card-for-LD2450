@@ -215,6 +215,6 @@ export class RadarZoneCardEditor extends HTMLElement {
     const entities = resolveDeviceEntitiesFromDevice(this.config.device_id, this.hassValue);
     const ipAddress = entities.ipAddress ? this.hassValue.states[entities.ipAddress]?.state?.trim() : "";
     if (!ipAddress || ipAddress === "unknown" || ipAddress === "unavailable") return "";
-    return `http://${ipAddress}/`;
+    return `http://${ipAddress}/dashboard`;
   }
 }
