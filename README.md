@@ -37,13 +37,13 @@ Preview 버전입니다.
 빌드된 파일을 Home Assistant의 `www` 폴더에 복사합니다.
 
 ```text
-dist/radar-zone-card.js
+dist/radar-zone-card-for-LD2450.js
 ```
 
 예시:
 
 ```text
-/config/www/radar-zone-card.js
+/config/www/radar-zone-card-for-LD2450..js
 ```
 
 ### 2. Lovelace 리소스 등록
@@ -51,7 +51,7 @@ dist/radar-zone-card.js
 Home Assistant에서 다음 리소스를 추가합니다.
 
 ```yaml
-url: /local/radar-zone-card.js
+url: /local/radar-zone-card-for-LD2450..js
 type: module
 ```
 
