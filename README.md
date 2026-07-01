@@ -116,6 +116,14 @@ targets:
 - 고급 다각형 Zone 편집은 카드 내부가 아니라 별도 웹앱과 연동하는 구조입니다.
 - 현재는 Preview 단계이므로 설정 구조가 변경될 수 있습니다.
 
+## 관련 저장소
+
+이 프로젝트는 아래 저장소들과 함께 동작합니다.
+
+- 펌웨어 / 내장 웹 대시보드: https://github.com/David2766/presence-sensor-xiao-s3
+- Home Assistant 커스텀 카드: https://github.com/David2766/radar-zone-card-for-LD2450
+- SmartThings Edge Driver: https://github.com/David2766/presence-sensor-smartthings-edge
+
 ## 개발
 
 의존성 설치:
