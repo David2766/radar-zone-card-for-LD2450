@@ -43,7 +43,7 @@ dist/radar-zone-card-for-LD2450.js
 예시:
 
 ```text
-/config/www/radar-zone-card-for-LD2450..js
+/config/www/radar-zone-card.js
 ```
 
 ### 2. Lovelace 리소스 등록
@@ -51,7 +51,7 @@ dist/radar-zone-card-for-LD2450.js
 Home Assistant에서 다음 리소스를 추가합니다.
 
 ```yaml
-url: /local/radar-zone-card-for-LD2450..js
+url: /local/radar-zone-card-for-LD2450.js
 type: module
 ```
 
